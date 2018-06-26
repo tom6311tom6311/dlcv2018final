@@ -4,9 +4,18 @@ from keras.layers import Input, Lambda, Dense, Dropout, Conv2D, MaxPooling2D, Fl
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop
 from keras.callbacks import EarlyStopping
+from keras.backend.tensorflow_backend import set_session
 from sklearn.cross_validation import train_test_split
-
+import sys
+import os
+import tensorflow as tf
 import io_data
+
+os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.3
+set_session(tf.Session(config=config))
 
 def euclidean_distance(vects):
     x, y = vects
