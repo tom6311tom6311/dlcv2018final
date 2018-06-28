@@ -160,6 +160,7 @@ base_imgs = np.reshape(base_imgs, (80, -1, height, width, channel))
 base_label = np.reshape(base_label, (80, -1))
 
 splite = 5
+np.random.seed(2767057678)
 print('train', np.random.get_state()[1][0])
 valid_idx = np.random.choice(base_label.shape[1], int(base_label.shape[1]/splite), replace=False)
 valid_imgs = np.reshape(base_imgs[:, valid_idx], (-1, height, width, channel))

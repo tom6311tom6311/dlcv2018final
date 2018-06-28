@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 print('io', np.random.get_state()[1][0])
+np.random.seed(3238936800)
 
 def read_imgs(path):
     #img = io.imread(path, as_grey=True)
