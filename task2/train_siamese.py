@@ -11,12 +11,6 @@ import os
 import tensorflow as tf
 import io_data
 
-os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
-
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.3
-set_session(tf.Session(config=config))
-
 def euclidean_distance(vects):
     x, y = vects
     return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
@@ -65,49 +59,61 @@ def create_base_network(input_d):
     seq.add(Dense(50, activation='relu'))
     return seq
 
-img_pairs, labels = io_data.read_train_pairwise('data/')
-img_pairs = img_pairs / 255
+if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 
-print(img_pairs.shape)
-print(labels.shape)
+    config = tf.ConfigProto()
+    config.gpu_options.per_process_gpu_memory_fraction = 0.3
+    set_session(tf.Session(config=config))
 
-img_pairs_train, img_pairs_test, labels_train, labels_test = train_test_split(img_pairs, labels, test_size=.1)
+    MODEL_PATH = str(sys.argv[2])
+
+    img_pairs, labels = io_data.read_train_pairwise('data/')
+    img_pairs = img_pairs / 255
+
+    print(img_pairs.shape)
+    print(labels.shape)
+
+    img_pairs_train, img_pairs_test, labels_train, labels_test = train_test_split(img_pairs, labels, test_size=.1)
 
 
-# because we re-use the same instance `base_network`,
-# the weights of the network
-# will be shared across the two branches
-input_dim = img_pairs_train.shape[2:]
-input_a = Input(shape=input_dim)
-input_b = Input(shape=input_dim)
-base_network = create_base_network(input_dim)
-processed_a = base_network(input_a)
-processed_b = base_network(input_b)
+    # because we re-use the same instance `base_network`,
+    # the weights of the network
+    # will be shared across the two branches
+    input_dim = img_pairs_train.shape[2:]
+    input_a = Input(shape=input_dim)
+    input_b = Input(shape=input_dim)
+    base_network = create_base_network(input_dim)
+    processed_a = base_network(input_a)
+    processed_b = base_network(input_b)
 
-distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
+    distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
 
-model = Model(inputs=[input_a, input_b], outputs=distance)
+    model = Model(inputs=[input_a, input_b], outputs=distance)
 
-# train
-epochs = 100
-rms = RMSprop()
-model.compile(loss=contrastive_loss, optimizer=rms)
-xtr1 = img_pairs_train[:, 0]
-xtr2 = img_pairs_train[:, 1]
-model.fit(
-  [xtr1, xtr2],
-  labels_train,
-  validation_split=.1,
-  batch_size=128,
-  verbose=2,
-  epochs=epochs,
-  callbacks=[EarlyStopping(monitor='val_loss', patience=5)])
+    # train
+    epochs = 100
+    rms = RMSprop()
+    model.compile(loss=contrastive_loss, optimizer=rms)
+    xtr1 = img_pairs_train[:, 0]
+    xtr2 = img_pairs_train[:, 1]
+    model.fit(
+        [xtr1, xtr2],
+        labels_train,
+        validation_split=.1,
+        batch_size=128,
+        verbose=2,
+        epochs=epochs,
+        callbacks=[EarlyStopping(monitor='val_loss', patience=5)])
 
-# compute final accuracy on training and test sets
-pred = model.predict([img_pairs_train[:, 0], img_pairs_train[:, 1]])
-tr_acc = compute_accuracy(pred, labels_train)
-pred = model.predict([img_pairs_test[:, 0], img_pairs_test[:, 1]])
-te_acc = compute_accuracy(pred, labels_test)
+    model.save(MODEL_PATH, include_optimizer=False)
+    print('model saved')
 
-print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
-print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
+    # compute final accuracy on training and test sets
+    pred = model.predict([img_pairs_train[:, 0], img_pairs_train[:, 1]])
+    tr_acc = compute_accuracy(pred, labels_train)
+    pred = model.predict([img_pairs_test[:, 0], img_pairs_test[:, 1]])
+    te_acc = compute_accuracy(pred, labels_test)
+
+    print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
+    print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
