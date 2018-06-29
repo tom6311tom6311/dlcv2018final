@@ -72,9 +72,14 @@ def read_train_pairwise(path, total_num=10000, novel_sample=5):
         base_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
 
     novel_img_paths = {}
+    novel_imgs_name = []
     for class_path in novel_class_paths:
         novel_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
         novel_img_paths[class_path] = np.random.choice(novel_img_paths[class_path], size=novel_sample)
+        novel_imgs_name.extend([ s[s.find('class'):] for s in novel_img_paths[class_path] ])
+
+    with open('novel_imgs_name' + str(novel_sample) + '.txt', 'w') as output:
+        output.write("\n".join(novel_imgs_name))
 
     # merge base_img_paths and novel_img_paths
     all_img_paths = base_img_paths.copy()
