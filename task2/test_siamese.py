@@ -18,14 +18,15 @@ sample = 5
 novel_class = 20
 img_size = 32
 
-def find_closest_class(dist, label, count=2):
+def find_closest_class(dist, label, count=3):
   idx_near_to_far = np.argsort(np.sum(np.square(dist), axis=1))
-  label_near_to_far = label[idx_near_to_far,]
+  label_near_to_far = label[idx_near_to_far,].astype('int')
   label_count = np.zeros((novel_class,))
   for l in label_near_to_far:
-    label_count[l] += 1
-    if label_count[l] == count:
-      return l
+    if l <= novel_class:
+      label_count[l] += 1
+      if label_count[l] == count:
+        return l
 
 def compute_acc(pred, true):
 
