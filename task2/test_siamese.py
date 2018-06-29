@@ -18,24 +18,8 @@ sample = 5
 novel_class = 20
 img_size = 32
 
-
-def find_max(sim, label):
-	idx = np.argmax(sim)
-
-	return label[idx]
-
-
-def find_mean(sim, label):
-	mean = []
-	for i in range(novel_class):
-		mean.append(np.mean(sim[i*sample:(i + 1)*sample]))
-
-	idx = np.argmax(mean)*5
-
-	return label[idx]
-
 def find_closest_class(dist, label, count=2):
-  idx_near_to_far = np.argsort(np.sum(np.square(a), axis=1))
+  idx_near_to_far = np.argsort(np.sum(np.square(dist), axis=1))
   label_near_to_far = label[idx_near_to_far,]
   label_count = np.zeros((novel_class,))
   for l in label_near_to_far:
