@@ -76,8 +76,6 @@ if __name__ == '__main__':
 	print('\n')
 
 	class_predictions = np.array(class_predictions)
-	print(list(class_predictions))
-	print(list(test_label))
 	acc = compute_acc(class_predictions, test_label)
 	print("Acc: ", acc)
 	'''
