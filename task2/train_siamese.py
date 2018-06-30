@@ -24,9 +24,9 @@ NUM_BASE_EXAMPLES = 500
 IMG_SIZE = 32
 BATCH_SIZE = 128
 MAX_EPOCH = 1000000
-NOVEL_RATIO = 4
+NOVEL_RATIO = 10
 DISPLAY_RATIO = 301
-PATIENCE = 10
+PATIENCE = 30
 
 def data_augm(imgs):
 	train_datagen = ImageDataGenerator(
@@ -155,7 +155,7 @@ def create_base_network(input_d):
     b_init = initializers.TruncatedNormal(mean = 0.5, stddev = 1e-2)
 
     seq = Sequential()
-    nb_filter = [32, 64, 64, 128]
+    nb_filter = [64, 128, 256, 256]
     kern_size = 3
     # conv layers
     seq.add(Conv2D(nb_filter[0], kern_size, kernel_initializer = w_init, bias_initializer = b_init, kernel_regularizer=l2(2e-4), input_shape=input_d, padding='same'))
@@ -227,7 +227,7 @@ if __name__ == '__main__':
             imgs_ori_novel, target_ori_novel = load_pair_batch(data, train_datagen, 'valid', 'novel')
             loss_val_base, acc_val_base = model.test_on_batch(imgs_val_base, target_val_base)
             loss_ori_novel, acc_ori_novel = model.test_on_batch(imgs_ori_novel, target_ori_novel)
-            print("iteration {}, training loss: {:.3f}, training acc: {:.3f},\nbase val loss: {:.3f}, base val acc: {:.3f},\nnovel loss: {:.3f}, novel acc: {:.3f}".format(i, loss, acc, loss_val_base, acc_val_base, loss_ori_novel, acc_ori_novel))
+            print("iteration {}, training loss: {:.3f}, training acc: {:.3f},base val loss: {:.3f}, base val acc: {:.3f},novel loss: {:.3f}, novel acc: {:.3f}".format(i, loss, acc, loss_val_base, acc_val_base, loss_ori_novel, acc_ori_novel))
 
 
             # apply earlystopping
