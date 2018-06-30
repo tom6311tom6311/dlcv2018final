@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     MODEL_PATH = str(sys.argv[2])
 
-    img_pairs, labels = io_data.read_train_pairwise('data/')
+    img_pairs, labels = io_data.read_train_pairwise('data/', total_num=100000)
 
     print('training img pairs shape: ', img_pairs.shape)
     print('training labels shape: ', labels.shape)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         validation_split=.1,
         batch_size=128,
         epochs=epochs,
-        callbacks=[EarlyStopping(monitor='val_loss', patience=100)])
+        callbacks=[EarlyStopping(monitor='val_loss', patience=30)])
 
     model.save(MODEL_PATH, include_optimizer=False)
     print('model saved')
