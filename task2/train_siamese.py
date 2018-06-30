@@ -6,6 +6,7 @@ from keras import initializers
 from keras.optimizers import RMSprop
 from keras.regularizers import l2
 from keras.callbacks import EarlyStopping
+from keras.metrics import binary_accuracy
 from keras.backend.tensorflow_backend import set_session
 from sklearn.cross_validation import train_test_split
 import sys
@@ -59,7 +60,7 @@ if __name__ == '__main__':
 
     MODEL_PATH = str(sys.argv[2])
 
-    img_pairs, labels = io_data.read_train_pairwise('data/', total_num=100000)
+    img_pairs, labels = io_data.read_train_pairwise('data/', total_num=50000)
 
     print('training img pairs shape: ', img_pairs.shape)
     print('training labels shape: ', labels.shape)
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     # train
     epochs = 1000
     rms = RMSprop()
-    model.compile(loss='binary_crossentropy', optimizer=rms)
+    model.compile(loss='binary_crossentropy', optimizer=rms, metrics=[binary_accuracy])
     xtr1 = img_pairs_train[:, 0]
     xtr2 = img_pairs_train[:, 1]
     model.fit(
@@ -97,7 +98,7 @@ if __name__ == '__main__':
         validation_split=.1,
         batch_size=128,
         epochs=epochs,
-        callbacks=[EarlyStopping(monitor='val_loss', patience=30)])
+        callbacks=[EarlyStopping(monitor='val_binary_accuracy', patience=10)])
 
     model.save(MODEL_PATH, include_optimizer=False)
     print('model saved')
