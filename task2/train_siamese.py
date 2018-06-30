@@ -10,15 +10,7 @@ import sys
 import os
 import tensorflow as tf
 import io_data
-
-def euclidean_distance(vects):
-    x, y = vects
-    return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
-
-
-def eucl_dist_output_shape(shapes):
-    shape1, shape2 = shapes
-    return (shape1[0], 1)
+import numpy as np
 
 
 def contrastive_loss(y_true, y_pred):
@@ -29,10 +21,10 @@ def contrastive_loss(y_true, y_pred):
     return K.mean(y_true * K.square(y_pred) + (1 - y_true) * K.square(K.maximum(margin - y_pred, 0)))
 
 
-def compute_accuracy(predictions, labels):
+def compute_accuracy(preds, labels):
     '''Compute classification accuracy with a fixed threshold on distances.
     '''
-    return labels[predictions.ravel() < 0.5].mean()
+    np.mean((preds == labels).astype(int))
 
 
 def create_base_network(input_d):
@@ -54,9 +46,7 @@ def create_base_network(input_d):
 
     # dense layers
     seq.add(Flatten())
-    seq.add(Dense(128, activation='relu'))
-    seq.add(Dropout(0.1))
-    seq.add(Dense(50, activation='relu'))
+    seq.add(Dense(128, activation='sigmoid'))
     return seq
 
 if __name__ == '__main__':
@@ -69,13 +59,11 @@ if __name__ == '__main__':
     MODEL_PATH = str(sys.argv[2])
 
     img_pairs, labels = io_data.read_train_pairwise('data/')
-    img_pairs = img_pairs / 255
 
-    print(img_pairs.shape)
-    print(labels.shape)
+    print('training img pairs shape: ', img_pairs.shape)
+    print('training labels shape: ', labels.shape)
 
     img_pairs_train, img_pairs_test, labels_train, labels_test = train_test_split(img_pairs, labels, test_size=.1)
-
 
     # because we re-use the same instance `base_network`,
     # the weights of the network
@@ -87,14 +75,22 @@ if __name__ == '__main__':
     processed_a = base_network(input_a)
     processed_b = base_network(input_b)
 
-    distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
+    L1_layer = Lambda(lambda tensors:K.abs(tensors[0] - tensors[1]))
+    L1_distance = L1_layer([processed_a, processed_b])
 
-    model = Model(inputs=[input_a, input_b], outputs=distance)
+    out = Dense(1, activation = 'sigmoid')(L1_distance)
+
+    model = Model(inputs=[input_a, input_b], outputs=out)
+
+    print('\n\nbase network: \n')
+    base_network.summary()
+    print('\n\njoint network: \n')
+    model.summary()
 
     # train
-    epochs = 100
+    epochs = 1000
     rms = RMSprop()
-    model.compile(loss=contrastive_loss, optimizer=rms)
+    model.compile(loss='binary_crossentropy', optimizer=rms)
     xtr1 = img_pairs_train[:, 0]
     xtr2 = img_pairs_train[:, 1]
     model.fit(
@@ -102,9 +98,8 @@ if __name__ == '__main__':
         labels_train,
         validation_split=.1,
         batch_size=128,
-        verbose=2,
-        epochs=epochs,
-        callbacks=[EarlyStopping(monitor='val_loss', patience=5)])
+        epochs=epochs)
+        # callbacks=[EarlyStopping(monitor='val_loss', patience=5)])
 
     model.save(MODEL_PATH, include_optimizer=False)
     print('model saved')

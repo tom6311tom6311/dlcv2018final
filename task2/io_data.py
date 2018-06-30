@@ -110,7 +110,7 @@ def read_train_pairwise(path, total_num=10000, novel_sample=5):
         train_imgs.extend(img_pairs)
         train_labels.extend([0] * len(img_pairs))
     
-    train_imgs = np.array(train_imgs)
+    train_imgs = np.array(train_imgs) / 255
     train_labels = np.array(train_labels)
 
     return train_imgs, train_labels
