@@ -13,40 +13,36 @@ import io_data
 import numpy as np
 
 
-def contrastive_loss(y_true, y_pred):
-    '''Contrastive loss from Hadsell-et-al.'06
-    http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
-    '''
-    margin = 1
-    return K.mean(y_true * K.square(y_pred) + (1 - y_true) * K.square(K.maximum(margin - y_pred, 0)))
-
 
 def compute_accuracy(preds, labels):
     '''Compute classification accuracy with a fixed threshold on distances.
     '''
-    np.mean((preds == labels).astype(int))
+    print(preds)
+    print(labels)
+    return np.mean((np.around(preds) == labels).astype(int))
 
 
 def create_base_network(input_d):
     '''Base network to be shared (eq. to feature extraction).
     '''
     seq = Sequential()
-    nb_filter = [32, 32]
+    nb_filter = [32, 64, 128]
     kern_size = 3
     # conv layers
-    seq.add(Conv2D(nb_filter[0], kern_size, input_shape=input_d, padding='valid'))
+    seq.add(Conv2D(nb_filter[0], kern_size, input_shape=input_d, padding='same'))
     seq.add(Activation('relu'))
-    seq.add(MaxPooling2D(pool_size=(2, 2)))  # downsample
-    seq.add(Dropout(.25))
-    # conv layer 2
-    seq.add(Conv2D(nb_filter[1], kern_size, padding='valid'))
-    seq.add(Activation('relu'))
-    seq.add(MaxPooling2D(pool_size=(2, 2)))  # downsample
-    seq.add(Dropout(.25))
+    seq.add(MaxPooling2D(pool_size=(2, 2)))
+    seq.add(Dropout(.2))
+
+    for nb_f in nb_filter[1:]:
+        seq.add(Conv2D(nb_f, kern_size, padding='same'))
+        seq.add(Activation('relu'))
+        seq.add(MaxPooling2D(pool_size=(2, 2)))
+        seq.add(Dropout(.2))
 
     # dense layers
     seq.add(Flatten())
-    seq.add(Dense(128, activation='sigmoid'))
+    seq.add(Dense(256, activation='sigmoid'))
     return seq
 
 if __name__ == '__main__':
@@ -65,9 +61,6 @@ if __name__ == '__main__':
 
     img_pairs_train, img_pairs_test, labels_train, labels_test = train_test_split(img_pairs, labels, test_size=.1)
 
-    # because we re-use the same instance `base_network`,
-    # the weights of the network
-    # will be shared across the two branches
     input_dim = img_pairs_train.shape[2:]
     input_a = Input(shape=input_dim)
     input_b = Input(shape=input_dim)
@@ -98,16 +91,16 @@ if __name__ == '__main__':
         labels_train,
         validation_split=.1,
         batch_size=128,
-        epochs=epochs)
-        # callbacks=[EarlyStopping(monitor='val_loss', patience=5)])
+        epochs=epochs,
+        callbacks=[EarlyStopping(monitor='val_loss', patience=30)])
 
     model.save(MODEL_PATH, include_optimizer=False)
     print('model saved')
 
     # compute final accuracy on training and test sets
-    pred = model.predict([img_pairs_train[:, 0], img_pairs_train[:, 1]])
+    pred = model.predict([img_pairs_train[:, 0], img_pairs_train[:, 1]]).reshape((-1,))
     tr_acc = compute_accuracy(pred, labels_train)
-    pred = model.predict([img_pairs_test[:, 0], img_pairs_test[:, 1]])
+    pred = model.predict([img_pairs_test[:, 0], img_pairs_test[:, 1]]).reshape((-1,))
     te_acc = compute_accuracy(pred, labels_test)
 
     print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
