@@ -72,9 +72,14 @@ def read_train_pairwise(path, total_num=10000, novel_sample=5):
         base_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
 
     novel_img_paths = {}
+    novel_imgs_name = []
     for class_path in novel_class_paths:
         novel_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
         novel_img_paths[class_path] = np.random.choice(novel_img_paths[class_path], size=novel_sample)
+        novel_imgs_name.extend([ s[s.find('class'):] for s in novel_img_paths[class_path] ])
+
+    with open('novel_imgs_name' + str(novel_sample) + '.txt', 'w') as output:
+        output.write("\n".join(novel_imgs_name))
 
     # merge base_img_paths and novel_img_paths
     all_img_paths = base_img_paths.copy()
@@ -105,7 +110,7 @@ def read_train_pairwise(path, total_num=10000, novel_sample=5):
         train_imgs.extend(img_pairs)
         train_labels.extend([0] * len(img_pairs))
     
-    train_imgs = np.array(train_imgs)
+    train_imgs = np.array(train_imgs) / 255
     train_labels = np.array(train_labels)
 
     return train_imgs, train_labels
@@ -128,7 +133,7 @@ def read_test(train_path, test_path, sample=5):
         label.append(f[l:l+2])
 
 
-    test_file = sorted([i for i in os.listdir(test_path)])
+    test_file = sorted([i for i in os.listdir(test_path) if 'class' in i])
     test_idx = [int(i[:i.find('.')]) for i in test_file]
     test_idx, test_file = zip(*sorted(zip(test_idx, test_file)))
     for f in test_file:
@@ -164,7 +169,7 @@ def read_test2(train_path, test_path, sample=5):
         label.append(f[l:l+2])
 
 
-    test_file = sorted([i for i in os.listdir(test_path)])
+    test_file = sorted([i for i in os.listdir(test_path) if 'class' in i])
     for f in test_file:
         imgs_file = sorted([i for i in os.listdir(os.path.join(test_path, f, 'train'))])[:100]
         for i in imgs_file:
