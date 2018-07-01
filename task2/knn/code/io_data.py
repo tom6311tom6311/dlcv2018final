@@ -174,7 +174,6 @@ def read_test(train_path, test_path, random=False, sample=5):
 def save_predict(predict, name):
     ## save predict 
     idx = np.arange(len(predict))
-    predict = list(map(int, predict))
     df = pd.DataFrame({'image_id':idx, 'predicted_label':predict})
     df.to_csv(name, index=False)
 
