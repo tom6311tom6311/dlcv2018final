@@ -16,7 +16,6 @@ import tensorflow as tf
 import io_data
 import numpy as np
 
-DATA_PATH = 'data/'
 NUM_BASE_CLASS = 80
 NUM_NOVEL_CLASS = 20
 NOVEL_SAMPLE = 5
@@ -183,7 +182,8 @@ if __name__ == '__main__':
     config.gpu_options.per_process_gpu_memory_fraction = 0.3
     set_session(tf.Session(config=config))
 
-    MODEL_PATH = str(sys.argv[2])
+    DATA_PATH = str(sys.argv[2])
+    MODEL_PATH = str(sys.argv[3])
 
     novel_imgs, novel_label, base_imgs, base_label = io_data.read_train(DATA_PATH, sample = NOVEL_SAMPLE)
     data = novel_imgs, novel_label, base_imgs, base_label

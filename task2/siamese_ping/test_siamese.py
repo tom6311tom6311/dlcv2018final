@@ -8,9 +8,6 @@ from keras.models import load_model
 import tensorflow as tf
 import io_data
 
-# path
-data_path = 'data/'
-
 # parameters
 sample = 5
 novel_class = 20
@@ -50,8 +47,9 @@ if __name__ == '__main__':
 	config.gpu_options.per_process_gpu_memory_fraction = 0.3
 	set_session(tf.Session(config=config))
 
-	model_path = sys.argv[2]
-	output_path = sys.argv[3]
+	data_path = str(sys.argv[2])
+	model_path = str(sys.argv[3])
+	output_path = str(sys.argv[4])
 
 	siamese = load_model(model_path)
 
