@@ -122,11 +122,11 @@ def training(model=model):
         if his[0] <= best_loss:
             best_loss = his[0]
             b = 0
+            save_model(model)
         else:
             b += 1
             if b >= 5:
                 break
-        save_model(model)
 
 
     save_log(his_loss, his_acc, his_loss1, his_loss2)
