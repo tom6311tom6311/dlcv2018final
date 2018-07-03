@@ -61,56 +61,6 @@ def read_train(path, base=True, sample=5):
 
     return novel_imgs, novel_label, base_imgs, base_label
 
-def read_train_pairwise(path, total_num=10000, novel_sample=5):
-    base_dir_path = os.path.join(path, 'base')
-    novel_dir_path = os.path.join(path, 'novel')
-    base_class_paths = sorted([os.path.join(base_dir_path, i) for i in os.listdir(base_dir_path) if 'class' in i])
-    novel_class_paths = sorted([os.path.join(novel_dir_path, i) for i in os.listdir(novel_dir_path) if 'class' in i])
-
-    base_img_paths = {}
-    for class_path in base_class_paths:
-        base_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
-
-    novel_img_paths = {}
-    for class_path in novel_class_paths:
-        novel_img_paths[class_path] = sorted([os.path.join(class_path, 'train', i) for i in os.listdir(os.path.join(class_path, 'train')) if '.png' in i])
-        novel_img_paths[class_path] = np.random.choice(novel_img_paths[class_path], size=novel_sample)
-
-    # merge base_img_paths and novel_img_paths
-    all_img_paths = base_img_paths.copy()
-    all_img_paths.update(novel_img_paths)
-
-    train_imgs = []
-    train_labels = []
-
-    for class_path, img_paths in all_img_paths.items():
-        img_paths_1 = np.random.choice(img_paths, size=int(total_num / len(all_img_paths)))
-        img_paths_2 = np.random.choice(img_paths, size=int(total_num / len(all_img_paths)))
-        
-        imgs_1 = [io.imread(img_path_1) for img_path_1 in img_paths_1]
-        imgs_2 = [io.imread(img_path_2) for img_path_2 in img_paths_2]
-        img_pairs = [ np.array([imgs_1[j], imgs_2[j]]) for j in range(len(imgs_1))]
-        train_imgs.extend(img_pairs)
-        train_labels.extend([1] * len(img_pairs))
-
-    for class_path_1, img_paths_1 in all_img_paths.items():
-        class_path_2 = np.random.choice(list(all_img_paths.keys()), size=1)[0]
-        while class_path_1 == class_path_2:
-            class_path_2 = np.random.choice(list(all_img_paths.keys()), size=1)[0]
-        img_paths_1_choices = np.random.choice(img_paths_1, size=int(total_num / len(all_img_paths)))
-        img_paths_2_choices = np.random.choice(all_img_paths[class_path_2], size=int(total_num / len(all_img_paths)))
-        imgs_1 = [io.imread(img_path_1) for img_path_1 in img_paths_1_choices]
-        imgs_2 = [io.imread(img_path_2) for img_path_2 in img_paths_2_choices]
-        img_pairs = [ np.array([imgs_1[j], imgs_2[j]]) for j in range(len(imgs_1))]
-        train_imgs.extend(img_pairs)
-        train_labels.extend([0] * len(img_pairs))
-    
-    train_imgs = np.array(train_imgs)
-    train_labels = np.array(train_labels)
-
-    return train_imgs, train_labels
-
-
 def read_test(train_path, test_path, sample=5):
     ## Read real test data #
     with open('novel_imgs_name' + str(sample) + '.txt', 'r') as ifile:
@@ -128,7 +78,7 @@ def read_test(train_path, test_path, sample=5):
         label.append(f[l:l+2])
 
 
-    test_file = sorted([i for i in os.listdir(test_path)])
+    test_file = sorted([i for i in os.listdir(test_path) if 'class' in i])
     test_idx = [int(i[:i.find('.')]) for i in test_file]
     test_idx, test_file = zip(*sorted(zip(test_idx, test_file)))
     for f in test_file:
@@ -164,7 +114,7 @@ def read_test2(train_path, test_path, sample=5):
         label.append(f[l:l+2])
 
 
-    test_file = sorted([i for i in os.listdir(test_path)])
+    test_file = sorted([i for i in os.listdir(test_path) if 'class' in i])
     for f in test_file:
         imgs_file = sorted([i for i in os.listdir(os.path.join(test_path, f, 'train'))])[:100]
         for i in imgs_file:
