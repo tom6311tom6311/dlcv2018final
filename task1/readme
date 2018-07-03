@@ -1,0 +1,7 @@
+# train
+./train.sh [data_path] [model_file]
+Ex: ./train.sh data/ model/model.h5
+
+# test
+./test.sh [data_path] [output_file]
+Ex: ./test.sh data/ result.csv
