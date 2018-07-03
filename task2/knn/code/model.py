@@ -11,10 +11,9 @@ from keras.losses import *
 #from keras.utils.vis_utils import plot_model
 
 filters = 32 
-l2_reg = regularizers.l2(1e-3)
+l2_reg = regularizers.l2(1e-4)
 
 def cnn_model_build(x):
-    print(K.int_shape(x))
     cnn = Sequential([
             Conv2D(filters, (3, 3), padding='same', input_shape=K.int_shape(x)[1:], kernel_regularizer=l2_reg, bias_regularizer=l2_reg, name='block1_conv1'),
             Activation('elu'),
@@ -68,3 +67,4 @@ def Recognition(height=32, width=32, channel=3, class_num=80):
 
 if __name__ == '__main__':
     Recognition()
+

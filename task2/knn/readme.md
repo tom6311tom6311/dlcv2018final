@@ -1,5 +1,5 @@
 
 # train
-$./knn_train.sh [training data path] [k shot]
+$./knn_train.sh [training data path]
 # test
-$./knn_train.sh [training data path] [test data path] [k shot] [model path]
+$./knn_train.sh [training data path] [test data path] [k shot] 

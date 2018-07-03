@@ -22,6 +22,7 @@ parser.add_argument('-l', '--log', help='log path')
 parser.add_argument('-m', '--model', help='model path')
 parser.add_argument('-s', '--sample', type=int, help='novel sample')
 parser.add_argument('-e', '--evaluate', type=int, help='novel sample')
+parser.add_argument('-r', '--randomseed', type=int, help='randomseed')
 args = parser.parse_args()
 
 log_path = args.log
@@ -30,6 +31,7 @@ train_path = args.train
 test_path = args.test
 sample = args.sample
 evaluate = args.evaluate
+randomseed = args.randomseed
 width = 32
 height= 32
 channel = 3
@@ -38,8 +40,13 @@ epoch = 30
       
     
 print('Read data')
-train_imgs, label, test_imgs = read_test(train_path, test_path, sample=sample, random=True)
+np.random.seed(randomseed)
+train_imgs, label, test_imgs = read_test(train_path, test_path, sample=sample)
+
 height, width, channel = train_imgs.shape[1:]
+
+# training imgs flip horizontally
+
 
 model, cnn_model = Recognition()
 model.load_weights(model_path)
@@ -56,13 +63,21 @@ test_imgs = np.reshape(test_imgs, (test_imgs.shape[0], -1))
 
 knc = KNeighborsClassifier(n_neighbors=1)
 knc.fit(train_imgs, label)
-predict = knc.predict(test_imgs)
+predict1 = knc.predict(test_imgs)
 
-save_predict(predict, 'knn_predict.csv')
+pca = PCA(n_components=64)
+pca.fit(np.vstack([train_imgs, test_imgs]))
+train_pca = pca.transform(train_imgs)
+test_pca = pca.transform(test_imgs)
 
-uni, count = np.unique(predict,  return_counts=True)
-for u, c in zip(uni, count):
-    print(u, c)
+knc = KNeighborsClassifier(n_neighbors=1)
+knc.fit(train_pca, label)
+predict2 = knc.predict(test_pca)
+
+
+save_predict(predict1, str(sample)+'_knn_predict.csv')
+save_predict(predict2, str(sample)+'_PCA_knn_predict.csv')   
+
 
 del model
     
