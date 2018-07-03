@@ -23,9 +23,9 @@ NUM_BASE_EXAMPLES = 500
 IMG_SIZE = 32
 BATCH_SIZE = 128
 MAX_EPOCH = 1000000
-NOVEL_RATIO = 10
+NOVEL_RATIO = 4
 DISPLAY_RATIO = 301
-PATIENCE = 30
+PATIENCE = 40
 
 def data_augm(imgs):
 	train_datagen = ImageDataGenerator(
@@ -154,7 +154,7 @@ def create_base_network(input_d):
     b_init = initializers.TruncatedNormal(mean = 0.5, stddev = 1e-2)
 
     seq = Sequential()
-    nb_filter = [64, 128, 256, 256]
+    nb_filter = [32, 64, 128]
     kern_size = 3
     # conv layers
     seq.add(Conv2D(nb_filter[0], kern_size, kernel_initializer = w_init, bias_initializer = b_init, kernel_regularizer=l2(2e-4), input_shape=input_d, padding='same'))
