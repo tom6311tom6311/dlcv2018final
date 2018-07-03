@@ -2,7 +2,7 @@
 import os
 import sys
 import numpy as np
-# import pandas as pd
+import pandas as pd
 from keras.backend.tensorflow_backend import set_session
 from keras.models import load_model
 import tensorflow as tf
@@ -76,8 +76,8 @@ if __name__ == '__main__':
 	class_predictions = np.array(class_predictions)
 	acc = compute_acc(class_predictions, test_label)
 	print("Acc: ", acc)
-	'''
-	f = pd.read_csv(output_path + 'sample_submission.csv')
-	f['predicted_label'] = prediction
-	f.to_csv(output_path + 'test.csv', index = False)
-	'''
+	
+	f = pd.read_csv(os.path.join(output_path, 'sample_submission.csv'))
+	f['predicted_label'] = class_predictions
+	f.to_csv(os.path.join(output_path, 'test.csv'), index = False)
+	
