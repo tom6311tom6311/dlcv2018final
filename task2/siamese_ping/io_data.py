@@ -133,7 +133,7 @@ def read_test(train_path, test_path, sample=5):
         label.append(f[l:l+2])
 
 
-    test_file = sorted([i for i in os.listdir(test_path) if 'class' in i])
+    test_file = sorted([i for i in os.listdir(test_path) if 'png' in i])
     test_idx = [int(i[:i.find('.')]) for i in test_file]
     test_idx, test_file = zip(*sorted(zip(test_idx, test_file)))
     for f in test_file:
