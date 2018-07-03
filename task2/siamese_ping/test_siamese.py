@@ -9,7 +9,6 @@ import tensorflow as tf
 import io_data
 
 # parameters
-sample = 5
 novel_class = 20
 img_size = 32
 
@@ -48,12 +47,14 @@ if __name__ == '__main__':
 	set_session(tf.Session(config=config))
 
 	data_path = str(sys.argv[2])
-	model_path = str(sys.argv[3])
-	output_path = str(sys.argv[4])
+	test_path = str(sys.argv[3])
+	model_path = str(sys.argv[4])
+	output_file = str(sys.argv[5])
+	sample = int(sys.argv[6])
 
 	siamese = load_model(model_path)
 
-	novel_imgs, novel_label, test_imgs, test_label = io_data.read_test2(data_path, os.path.join(data_path, 'novel'), sample = sample)
+	novel_imgs, novel_label, test_imgs = io_data.read_test(data_path, test_path, sample = sample)
 
 	pairs = [np.zeros((sample*novel_class, img_size, img_size, 3)) for i in range(2)]
 
@@ -74,10 +75,9 @@ if __name__ == '__main__':
 	print('\n')
 
 	class_predictions = np.array(class_predictions)
-	acc = compute_acc(class_predictions, test_label)
-	print("Acc: ", acc)
-	
-	f = pd.read_csv(os.path.join(output_path, 'sample_submission.csv'))
-	f['predicted_label'] = class_predictions
-	f.to_csv(os.path.join(output_path, 'test.csv'), index = False)
-	
+	# acc = compute_acc(class_predictions, test_label)
+	# print("Acc: ", acc)
+
+	idx = np.arange(len(class_predictions))
+	f = pd.DataFrame({'image_id':idx, 'predicted_label':class_predictions})
+	f.to_csv(output_file, index = False)
