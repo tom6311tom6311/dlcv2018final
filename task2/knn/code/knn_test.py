@@ -20,6 +20,7 @@ parser.add_argument('--train', help='train data path')
 parser.add_argument('--test', help='test data path')
 parser.add_argument('-l', '--log', help='log path')
 parser.add_argument('-m', '--model', help='model path')
+parser.add_argument('-o', '--output', help='output path')
 parser.add_argument('-s', '--sample', type=int, help='novel sample')
 parser.add_argument('-e', '--evaluate', type=int, help='novel sample')
 parser.add_argument('-r', '--randomseed', type=int, help='randomseed')
@@ -30,6 +31,7 @@ model_path = args.model
 train_path = args.train
 test_path = args.test
 sample = args.sample
+output_path = args.output
 evaluate = args.evaluate
 randomseed = args.randomseed
 width = 32
@@ -75,8 +77,8 @@ knc.fit(train_pca, label)
 predict2 = knc.predict(test_pca)
 
 
-save_predict(predict1, str(sample)+'_knn_predict.csv')
-save_predict(predict2, str(sample)+'_PCA_knn_predict.csv')   
+save_predict(predict1, os.path.join(output_path, str(sample)+'_knn_predict.csv'))
+save_predict(predict2, os.path.join(output_path, str(sample)+'_PCA_knn_predict.csv'))   
 
 
 del model
