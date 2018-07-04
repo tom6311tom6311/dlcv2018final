@@ -7,7 +7,7 @@ Model 已儲存於 repo 中， testing script 如下：
 --> 會輸出 `out.csv`
 
 ####Task 2  
-我們實作了4種模型，其中以 (3) performance 最佳，因此**助教可直接跑 (3)**  
+我們實作了4種模型，其中 (3)(4) performance 有過 baseline，因此**助教可直接跑 (3)(4)**  
 各模型 training 與 testing script如下：
 
 (1) Siamese Network
