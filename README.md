@@ -1,12 +1,12 @@
 ### README
-####Task 1
+####Task 1  
 Model 已儲存於 repo 中， testing script 如下：
 - $> `cd task1/`
 - $> `./test.sh <data_dir> out.csv`
 --> 其中 *<data_dir>* 為包含 `test/` 資料夾的母資料夾
 --> 會輸出 `out.csv`
 
-####Task 2
+####Task 2  
 我們實作了4種模型，其中以 (3) performance 最佳，因此**助教可直接跑 (3)**  
 各模型 training 與 testing script如下：
 
