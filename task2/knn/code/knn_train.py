@@ -31,9 +31,9 @@ def save_model(model):
     model.save_weights(os.path.join(model_path, 'knn_model.h5'))
 
 def save_log(loss, acc):
-    with open(os.path.join(log_path, 'knn_loss_'+str(sample)+'.log'), 'wb') as handle:
+    with open(os.path.join(log_path, 'knn_loss.log'), 'wb') as handle:
         pickle.dump(loss, handle)
-    with open(os.path.join(log_path, 'knn_acc_'+str(sample)+'.log'), 'wb') as handle:
+    with open(os.path.join(log_path, 'knn_acc_.log'), 'wb') as handle:
         pickle.dump(acc, handle)
         
 np.random.seed(2926141147)
