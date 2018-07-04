@@ -32,6 +32,9 @@ def conv(input):
 
 	x = Flatten()(x)
 
+	x = Dense(units = 256, activation = 'elu', kernel_regularizer = reg, name = 'fc1')(x)
+	#x = Dense(units = 64, activation = 'elu', kernel_regularizer = reg, name = 'fc2')(x)
+
 	return x
 
 
@@ -43,7 +46,8 @@ def matching_net(sample_ = 5, average_per_class_ = True, img_size = 32, batch_si
 	tmp_in = Input((img_size, img_size, 3))
 	conv_emb = conv(tmp_in)
 	conv_net = Model(inputs = tmp_in, outputs = conv_emb)
-	conv_net.load_weights('model/pretrained1.h5', by_name = True)
+	conv_net.load_weights('model/pretrained2.h5', by_name = True)
+	#conv_net.load_weights('model/matching_pre2.h5', by_name = True)
 
 	support_label = Input((n_supportset_, nway))
 
@@ -60,4 +64,4 @@ def matching_net(sample_ = 5, average_per_class_ = True, img_size = 32, batch_si
 
 	model = Model(inputs = [input1, input2, support_label], outputs = out)
 
-	return model
+	return conv_net, model

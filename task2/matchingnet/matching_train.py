@@ -20,7 +20,7 @@ import io_data
 from match import cosine_sim, euclidean_sim
 from matching_model import *
 
-np.random.seed()
+#np.random.seed()
 
 # path
 data_path = sys.argv[1]
@@ -183,11 +183,12 @@ if __name__ == '__main__':
 	train_datagen = data_augm(novel_imgs)
 	data = novel_imgs, novel_label, base_imgs, base_label
 
-	matching = matching_net(sample_ = sample, average_per_class_ = average_per_class)
+	conv_net,  matching = matching_net(sample_ = sample, average_per_class_ = average_per_class, nway = nway)
 
-	matching.compile(loss = "categorical_crossentropy", optimizer = Adam(lr = 1.0e-6, decay = 1.0e-7), metrics=[categorical_accuracy])
+	matching.compile(loss = "categorical_crossentropy", optimizer = Adam(lr = 1.0e-5, decay = 1.0e-6), metrics=[categorical_accuracy])
 
-	acc_lowest = 0.0
+	loss_highest = 100.0
+	lowest_acc = 0.0
 	
 	for i in range(n_iterations):
 		if (i+1) % novel_ratio == 0:
@@ -203,14 +204,15 @@ if __name__ == '__main__':
 			print("iteration {}, training loss: {:.3f}, training acc: {:.3f}, val loss: {:.3f}, val acc: {:.3f}".format(i, loss, acc, loss_val, acc_val))
 
 			# apply earlystopping
-			if acc_val > acc_lowest:
-				acc_lowest = acc_val
+			if acc_val >= lowest_acc:
+				lowest_acc = acc_val
 				patience_cnt = 0
 				matching.save(model_path)
+				#conv_net.save('model/matching_pre2.h5')
 			else:
 				patience_cnt += 1
 
-			if patience_cnt > patience and i > 10:
+			if patience_cnt > patience and i > 200:
 				print('Early stopping...')
 				break
 
