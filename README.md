@@ -22,17 +22,20 @@ Model 已儲存於 repo 中， testing script 如下：
 (2) Relation Network
 - $> `cd task2/relationnet/`
 - $> `./train.sh <train_data_dir> 1`
-- $> `./test.sh <train_data_dir> <test_data_dir> out_1.csv 1`
---> 會輸出 `out_1.csv`，為 1-shot 結果
+- $> `./test.sh <train_data_dir> <test_data_dir> ./ 1`
+--> 會輸出 `Relation_sample_1_predict.csv`，為 1-shot 結果
 - $> `./train.sh <train_data_dir> 5`
-- $> `./test.sh <train_data_dir> <test_data_dir> out_5.csv 5`
---> 會輸出 `out_5.csv`，為 5-shot 結果
+- $> `./test.sh <train_data_dir> <test_data_dir> ./ 5`
+--> 會輸出 `Relation_sample_5_predict.csv`，為 5-shot 結果
 - $> `./train.sh <train_data_dir> 10`
-- $> `./test.sh <train_data_dir> <test_data_dir> out_10.csv 10`
---> 會輸出 `out_10.csv`，為 10-shot 結果
+- $> `./test.sh <train_data_dir> <test_data_dir> ./ 10`
+--> 會輸出 `Relation_sample_10_predict.csv`，為 10-shot 結果
 
-(3) Matching Network
+(3) Matching Network  
+Model 已儲存於 repo 中， testing script 如下：
 - $> `cd task2/matchingnet/`
+- $> `./matching_test.sh <train_data_dir> <test_data_dir> out_1.csv out_5.csv out_10.csv`
+--> 會輸出 `out_1.csv`、 `out_5.csv`、`out_10.csv`，分別為 1/5/10-shot 的結果
 
 (4) CNN + (PCA) + KNN
 - $> `cd task2/knn/`
