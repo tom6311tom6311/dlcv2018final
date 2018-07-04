@@ -20,6 +20,7 @@ parser.add_argument('--train', help='train data path')
 parser.add_argument('--test', help='test data path')
 parser.add_argument('-l', '--log', help='log path')
 parser.add_argument('-m', '--model', help='model path')
+parser.add_argument('-o', '--output', help='output path')
 parser.add_argument('-s', '--sample', type=int, help='novel sample')
 parser.add_argument('-e', '--evaluate', type=int, help='novel sample')
 args = parser.parse_args()
@@ -28,8 +29,10 @@ log_path = args.log
 model_path = args.model
 train_path = args.train
 test_path = args.test
+output_path = args.output
 sample = args.sample
 evaluate = args.evaluate
+
 width = 32
 height= 32
 channel = 3
@@ -70,7 +73,7 @@ for i in range(test_imgs.shape[0]):
         predict_dict[u] = np.sum(proI[idx][label[idx]==u])
     predict7.append(max(predict_dict, key=lambda k: predict_dict[k]))
     
-    save_predict(predict7, 'Relation_sample_'+str(sample)+'_predict.csv')
+    save_predict(predict7, os.path.join(output_path, 'Relation_sample_'+str(sample)+'_predict.csv'))
 
 del model
     

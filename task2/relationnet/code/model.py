@@ -11,7 +11,7 @@ from keras.losses import *
 from keras.metrics import *
 #from keras.utils.vis_utils import plot_model
 
-filters = 64 
+filters = 64
 l2_reg = regularizers.l2(5e-4)
 
 def cnn_model_build(x):
@@ -101,7 +101,7 @@ def RelationNet(height=32, width=32, channel=3):
     f_logits = rnet(cnn2(x))
 
     def total_loss(y_true, y_pred):
-        return mean_squared_error(y_true, y_pred) + 5e-1* mean_squared_error(logits1, logits2) #+ -5e-1 * (y_true*2-1) * y_pred
+        return mean_squared_error(y_true, y_pred) + 5e-1* mean_squared_error(logits1, logits2) + -5e-1 * (y_true*2-1) * y_pred
 
     def acc(y_trud, y_pred):
         return binary_accuracy(y_trud, y_pred)

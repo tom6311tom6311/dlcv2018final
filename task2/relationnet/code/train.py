@@ -134,4 +134,3 @@ def training(model=model):
     del model
 
 training()
-
